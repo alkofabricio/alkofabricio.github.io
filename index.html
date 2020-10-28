@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Auxiliar de Notas Saber</title>
+
+    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+
+<style>
+    body {
+        text-align: center;
+    }
+
+    .instrucoesBox {
+        margin-left: 5em;
+        margin-right: 5em;
+    }
+
+
+    .grid-container {
+        display: grid;
+    }
+</style>
+
+
+<body>
+    <div class="instrucoesBox">
+        <p>Para funcionar corretamente, deve ser seguido em um formato específico, sendo o nome do aluno exatamente como
+            está no Saber, espaço, traço, espaço e o valor da nota.</p>
+        <p>Após montar a lista dos alunos com suas notas, você irá copiar e colar no <b>Console do Sistema Saber</b>
+            para
+            preencher as notas.</p>
+        <p>Para acessar o Console, basta ir até a página das notas que você quer cadastrar, clicar com o botão direito
+            do mouse, clicar em inspecionar. Na janela ao lado que abriu, procure por Console. Clique no espaço vazio do
+            Console e Cole o comando gerado aqui.</p>
+
+        <b>Modelo de formatação das notas:</b>
+
+        <p>Nome Completo do Aluno - 9<br>
+            Nome de Outro Aluno - 7<br>
+            Qualquer Nome Qualquer - 5</p>
+
+    </div>
+    <div class="grid-container">
+        <div class="grid-item">
+     
+
+            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea mdc-text-field--no-label">
+                <span class="mdc-notched-outline">
+                    <span class="mdc-notched-outline__leading"></span>
+                    <span class="mdc-notched-outline__trailing"></span>
+                </span>
+                <span class="mdc-text-field__resizer">
+                    <textarea class="mdc-text-field__input" id="input" rows="8" cols="60" aria-label="Label"
+                        placeholder="Insira sua lista aqui de acordo com o modelo acima. Este campo é editável."></textarea>
+                </span>
+            </label>
+
+            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea mdc-text-field--no-label">
+                <span class="mdc-notched-outline">
+                    <span class="mdc-notched-outline__leading"></span>
+                    <span class="mdc-notched-outline__trailing"></span>
+                </span>
+                <span class="mdc-text-field__resizer">
+                    <textarea class="mdc-text-field__input" id="output" rows="8" cols="60" aria-label="Label"
+                        readonly="true" placeholder="Aqui sairá o comando pronto para inserir no Saber. Este campo não é editável."></textarea>
+                </span>
+            </label>
+
+        </div>
+        <hr>
+        <div class="grid-item">
+
+            <button id="botaoLimpar" class="mdc-button mdc-button--raised">
+                <span class="mdc-button__label">Limpar Tudo</span>
+            </button>
+
+            <button id="botaoConverter" class="mdc-button mdc-button--raised">
+                <span class="mdc-button__label">Converter</span>
+            </button>
+
+            <button id="botaoCopiar" class="mdc-button mdc-button--raised">
+                <span class="mdc-button__label">Copiar Novamente</span>
+            </button>
+
+        </div>
+
+        <p>Feito por <b>Aleksandro Fabrício</b></p>
+        <b>alekfabricio@gmail.com</b>
+    </div>
+
+
+
+    <script type="text/javascript">
+        document.getElementById('botaoConverter')
+            .addEventListener('click', function () {
+                copiarOutput(document.getElementById('input').value);
+
+            });
+
+        document.getElementById("botaoCopiar")
+            .addEventListener('click', function () { copiarOutput(document.getElementById('input').value) });
+
+        document.getElementById("botaoLimpar")
+            .addEventListener('click', function () {
+                document.getElementById('input').value = "";
+                document.getElementById('output').value = "";
+            });
+
+        function copiarOutput(texto) {
+            if (texto == "") {
+                alert("O texto está vazio. Tente inserir sua lista de notas corretamente de acordo com as instruções.");
+            } else {
+                var output = document.getElementById('output');
+                output.value = "var lista = " + tratamento(texto);
+                output.select();
+
+                document.execCommand("copy");
+
+                alert("O comando foi copiado com sucesso!")
+            }
+
+        }
+
+
+        function tratamento(texto) {
+            texto = texto.split("\n");
+            var lista = [];
+            texto.forEach(item => {
+                if (item.split(" - ")[1]) {
+                    item = item.replace("\t", "").replace("\r", "").toLowerCase().replace("\t", "").split(" - ");
+                } else {
+                    item = item.replace("\t", "").replace("\r", "").toLowerCase().split("-\t");
+                }
+                lista.push(item);
+            });
+
+            var saida = "[";
+            lista.map(item => {
+                saida = saida + `["${item[0]}","${item[1]}"],`
+            });
+            saida = saida + "];";
+            saida = saida + "\n" + "var cont = -1; for (var aluno of document.querySelectorAll('[class*=span8]')) { lista.forEach(item => { if (item[0] == aluno.textContent.trim().toLowerCase()) { var nota = document.getElementById('class_rating_enrollment_ratings_attributes_' + cont + '_rating'); nota.value = item[1];}}); cont = cont + 1;}";
+            return saida;
+        }
+    </script>
+</body>
+
+</html>
